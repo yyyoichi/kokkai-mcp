@@ -1,0 +1,61 @@
+{
+	"name": "KokkaiMCP-Dev",
+	"image": "mcr.microsoft.com/devcontainers/base:bullseye",
+	"workspaceFolder": "/workspaces",
+ 	"workspaceMount": "source=${localWorkspaceFolder},target=/workspaces,type=bind,consistency=cached",
+	"features": {
+		"ghcr.io/jsburckhardt/devcontainer-features/ruff:1": {},
+		"ghcr.io/jsburckhardt/devcontainer-features/uv:1": {},
+		"ghcr.io/devcontainers-extra/features/ddgr-apt-get:1": {},
+		"ghcr.io/devcontainers/features/node:1": {},
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {},
+		"ghcr.io/devcontainers/features/aws-cli:1":{},
+		"ghcr.io/devcontainers-extra/features/aws-cdk:2": {}
+	},
+	"mounts": [
+		{
+			"type": "volume",
+			"source": "kokkai-mcp-venv",
+			"target": "/workspaces/.venv"
+		},
+		{
+			"type": "volume",
+			"source": "kokkai-mcp-cdk-node_modules",
+			"target": "/workspaces/cdk/node_modules"
+		},
+		{
+			"type": "volume",
+			"source": "kokkai-mcp-minio-local",
+			"target": "/miniolocaldata"
+		},
+		{
+			"type": "bind",
+			"source": "${localEnv:HOME}/.ssh",
+			"target": "/root/.ssh"
+		},
+		{
+			"type": "bind",
+			"source": "${localEnv:HOME}/.aws",
+			"target": "/root/.aws"
+		}
+	],
+	"postCreateCommand": "sh /workspaces/.devcontainer/init.sh && git config --global --add safe.directory ${containerWorkspaceFolder}",
+	"postStartCommand": "sh /workspaces/.devcontainer/start.sh && git config --global --add safe.directory ${containerWorkspaceFolder}",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-python.python",
+				"ms-python.debugpy",
+				"charliermarsh.ruff",
+				"LittleFoxTeam.vscode-python-test-adapter"
+			],
+			"settings": {
+			}
+		}
+	},
+	"remoteUser": "root",
+	"containerEnv": {
+    	"TZ": "Asia/Tokyo",
+		"ENV": "local"
+  	}
+}

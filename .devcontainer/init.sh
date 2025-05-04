@@ -1,0 +1,1 @@
+echo "Hi, initializing the devcontainer..."

@@ -1,4 +1,5 @@
 {
+    "debugpy.debugJustMyCode": false,
     "ruff.interpreter": [
         "./.venv/bin/python"
     ],

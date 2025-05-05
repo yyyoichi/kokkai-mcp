@@ -210,6 +210,18 @@ wheels = [
 ]
 
 [[package]]
+name = "hishel"
+version = "0.1.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "httpx" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/a8/3d/f754187b9703a8db211e80cef0fc4e27e0ab2edbeacccf1257c096dade48/hishel-0.1.2.tar.gz", hash = "sha256:6643450bfb1cfa2ecd6002769f6f5069d0d048c9c1f1e29a98a48302d5875092", size = 36240, upload-time = "2025-04-04T21:15:57.213Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/11/23/a33edb262bb7732a528595b008c7b3640bea4be7e7417cbaff8f978ead72/hishel-0.1.2-py3-none-any.whl", hash = "sha256:802b4e446017f4867efdb26d3417670991ad1b4826d24331110871fe8957b5d0", size = 42237, upload-time = "2025-04-04T21:15:55.781Z" },
+]
+
+[[package]]
 name = "hpack"
 version = "4.1.0"
 source = { registry = "https://pypi.org/simple" }
@@ -622,6 +634,7 @@ name = "workspaces"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "hishel" },
     { name = "microsoft-kiota-abstractions" },
     { name = "microsoft-kiota-authentication-azure" },
     { name = "microsoft-kiota-bundle" },
@@ -633,6 +646,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "hishel", specifier = ">=0.1.2" },
     { name = "microsoft-kiota-abstractions", specifier = ">=1.9.3" },
     { name = "microsoft-kiota-authentication-azure", specifier = ">=1.9.3" },
     { name = "microsoft-kiota-bundle", specifier = ">=1.9.3" },

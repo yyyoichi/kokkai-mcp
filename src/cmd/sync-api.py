@@ -5,7 +5,7 @@ from src.config import KokkkaiAPIRequestConfig
 from src.kokkaiapiclient.api.speech.speech_get_response import SpeechGetResponse
 
 if __name__ == "__main__":
-    c = Client(config=KokkkaiAPIRequestConfig(usecache=True, interval_milsec=1000))
+    c = Client(config=KokkkaiAPIRequestConfig(refer_cache=True, interval_milsec=1000))
     async def worker(year: int, month: int):
         """
         Get speech data for a specific year and month.

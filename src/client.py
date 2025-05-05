@@ -27,14 +27,19 @@ def get_client() -> ApiClient:
     )
     return ApiClient(request_adapter=HttpxRequestAdapter(authentication_provider=AnonymousAuthenticationProvider(), http_client=cache_client))
 
+def get_client_no_cache() -> ApiClient:
+    return ApiClient(request_adapter=HttpxRequestAdapter(authentication_provider=AnonymousAuthenticationProvider()))
 
 class Client():
     """
     Client class for interacting with the Kokkkai API.
     """
-    def __init__(self, config: KokkkaiAPIRequestConfig = KokkkaiAPIRequestConfig(interval_milsec=1000, usecache=True)):
-        self.config = config
-        self.client = get_client()
+    def __init__(self, config: KokkkaiAPIRequestConfig = KokkkaiAPIRequestConfig()):
+        self.config = config.regularize()
+        if self.config.use_cache:
+            self.client = get_client()
+        else:
+            self.client = get_client_no_cache()
 
     async def iter_speech(self, year: int, month: int):
         request_enable = datetime.now()
@@ -50,22 +55,23 @@ class Client():
         while has_next:
             speech: SpeechGetResponse | None = None
 
-            exists_cache = False
-            if self.config.usecache == True:
+            if self.config.refer_cache == True:
                 # ストレージから引く
                 h = HeadersCollection()
                 h.try_add("Cache-Control", "only-if-cached")
                 conf = RequestConfiguration[SpeechRequestBuilder.SpeechRequestBuilderGetQueryParameters](headers=h, query_parameters=param)
                 try:
                     speech = await self.client.api.speech.get(request_configuration=conf)
-                    exists_cache = True
                 except Exception as e:
                     # print("ストレージから取得できませんでした。", e)
                     pass
-            
+            # キャッシュが存在したかどうか
+            exists_cache = True
             if speech is None:
+                exists_cache = False
+                
                 h = HeadersCollection()
-                if self.config.usecache == False:
+                if self.config.refer_cache == False:
                     h.try_add("Cache-Control", "no-cache")
                 conf = RequestConfiguration[SpeechRequestBuilder.SpeechRequestBuilderGetQueryParameters](headers=h, query_parameters=param)
                 # もし現在時刻がreuqest_enableに満たなければその時間まで待機する

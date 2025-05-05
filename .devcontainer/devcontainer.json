@@ -56,6 +56,12 @@
 	"remoteUser": "root",
 	"containerEnv": {
     	"TZ": "Asia/Tokyo",
-		"ENV": "local"
-  	}
+		"ENV": "local",
+		"MINIO_PORT": "9000",
+		"MINIO_ENDPOINT": "http://localhost:9000",
+		"MINIO_ROOT_USER": "minioadmin",
+      	"MINIO_ROOT_PASSWORD": "minioadmin",
+		"BUCKET_NAME": "kokkai-mcp-bucket"
+  	},
+	"forwardPorts": [9000,9001]
 }

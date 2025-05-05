@@ -13,4 +13,10 @@ else
     echo "skip make venv"
 fi
 
+echo "Installing kiota..."
+curl "https://aka.ms/get/kiota/latest/linux-x64.zip" -o kiota.zip
+unzip -o kiota.zip -d /usr/local/bin
+chmod +x /usr/local/bin/kiota
+rm kiota.zip
+
 echo "Devcontainer initialized."

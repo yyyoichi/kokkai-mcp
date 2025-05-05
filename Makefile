@@ -9,3 +9,7 @@ init-bucket:
 	aws s3api put-bucket-policy --bucket ${BUCKET_NAME} --policy $$POLICY \
 		--endpoint-url ${MINIO_ENDPOINT} --region ap-northeast-1
 .PHONY: init-bucket
+
+
+gen-client:
+	kiota generate -l python -d "https://yyyoichi.github.io/kokkai-api-schema/schema/openapi.yaml" -n client -o ./src/kokkaiapiclient

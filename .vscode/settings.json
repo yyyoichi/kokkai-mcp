@@ -8,4 +8,14 @@
     "python.testing.unittestEnabled": false,
     "python.testing.pytestEnabled": true,
     "python.defaultInterpreterPath": "./.venv/bin/python",
+    "python.analysis.autoImportCompletions": true,
+    "python.analysis.supportRestructuredText": true,
+    "python.analysis.typeCheckingMode": "strict",
+    "python.analysis.ignore": [
+        "./src/kokkaiapiclient/**/*.py",
+    ],
+    "python.autoComplete.extraPaths": [
+        "./src/**/*.py",
+        "./.venv/lib/python3.13/site-packages/**/*.py",
+    ],
 }

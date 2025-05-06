@@ -13,4 +13,5 @@ dependencies = [
     "microsoft-kiota-serialization-json>=1.9.3",
     "microsoft-kiota-serialization-text>=1.9.3",
     "pytest>=8.3.5",
+    "sentence-transformers>=4.1.0",
 ]

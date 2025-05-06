@@ -14,9 +14,10 @@
     "python.analysis.typeCheckingMode": "strict",
     "python.analysis.ignore": [
         "./src/kokkaiapiclient/**/*.py",
+        "./.venv/lib/python3.13/site-packages/**/*.py"
     ],
     "python.autoComplete.extraPaths": [
         "./src/**/*.py",
-        "./.venv/lib/python3.13/site-packages/**/*.py",
-    ],
+        "./.venv/lib/python3.13/site-packages/**/*.py"
+    ]
 }

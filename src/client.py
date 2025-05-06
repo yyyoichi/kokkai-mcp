@@ -66,9 +66,8 @@ class Client():
                     # print("ストレージから取得できませんでした。", e)
                     pass
             # キャッシュが存在したかどうか
-            exists_cache = True
+            exists_cache = speech is not None
             if speech is None:
-                exists_cache = False
                 
                 h = HeadersCollection()
                 if self.config.refer_cache == False:

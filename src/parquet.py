@@ -19,15 +19,13 @@ class SpeechParquet:
             schema=SpeechParquetModel.pyarrow_schema())
         self.writer.write_table(table)
 
-    def close(self):
+    def getvalue(self):
         """
-        書き込みを終了する。
+        書き込みを終了してBuffer値を取得する。
         """
         self.writer.close()
-
-    def get_buffer(self):
-        """
-        bufferを取得する。
-        """
+        ## getvalueするとbufferがcloseになる（self.writer.writerがcloseする）
         return self.buffer.getvalue()
+
+
 

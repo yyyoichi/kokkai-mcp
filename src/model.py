@@ -51,10 +51,10 @@ class SpeechParquetModel:
     def pyarrow_schema() -> pa.Schema:
         s = pa.schema(fields=[ # type: ignore 
             pa.field('date', pa.string()), # type: ignore
-            pa.field('session', pa.int8()),  # type: ignore
+            pa.field('session', pa.int16()),  # type: ignore
             pa.field('name_of_house', pa.string()), # type: ignore
             pa.field('name_of_meeting', pa.string()), # type: ignore
-            pa.field('issue', pa.int8()),  # type: ignore
+            pa.field('issue', pa.int16()),  # type: ignore
             pa.field('issue_id', pa.string()), # type: ignore
             pa.field('speaker', pa.string()), # type: ignore
             pa.field('speech_order', pa.int16()),  # type: ignore

@@ -8,8 +8,8 @@ def initialize_model():
         model = SentenceTransformer("intfloat/multilingual-e5-small")
         print("Model initialized")
 
-def encode_text(sentences: list[str]):
+def encode_text(sentences: list[str]) -> list[list[float]]:
     global model
     if model is None:
         initialize_model()
-    return model.encode(sentences=sentences, convert_to_tensor=True) # type: ignore
+    return model.encode(sentences=sentences, convert_to_tensor=False).tolist() # type: ignore

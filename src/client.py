@@ -2,6 +2,7 @@ import asyncio
 from calendar import monthrange
 from datetime import timedelta, datetime
 from pathlib import Path
+from typing import AsyncGenerator
 import hishel
 import httpx
 from src.config import KokkkaiAPIRequestConfig
@@ -41,7 +42,7 @@ class Client():
         else:
             self.client = get_client_no_cache()
 
-    async def iter_speech(self, year: int, month: int):
+    async def iter_speech(self, year: int, month: int) -> AsyncGenerator[SpeechGetResponse, None]:
         request_enable = datetime.now()
         has_next = True
         param = SpeechRequestBuilder.SpeechRequestBuilderGetQueryParameters(

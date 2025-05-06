@@ -7,4 +7,4 @@ if __name__ == "__main__":
         "毎朝パンを食べているけど、今日はご飯を食べた",
     ]
     result = encode_text(sentences)
-    print(result.shape)
+    print(len(result))

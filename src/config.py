@@ -37,17 +37,21 @@ class KokkkaiAPIRequestConfig:
 
 
 
-# iter_speech メソッドを持つプロトコルを定義
-class SpeechApiClientProtocol(Protocol):
-    def iter_speech(
-        self, year: int, month: int
-    ) -> AsyncGenerator[SpeechGetResponse, None]: ...
+
+
 
 @dataclass
 class UploadSpeechParquetDependency:
+    class SpeechApiClientProtocol(Protocol):
+        def iter_speech(
+            self, year: int, month: int
+        ) -> AsyncGenerator[SpeechGetResponse, None]: ...
+    class StorageClientProtocol(Protocol):
+        def upload_parquet(self, year: int, month: int, buffer: io.BytesIO) -> None: ...
+
     # APIの取得クライアント
     api_client: SpeechApiClientProtocol
     # 発言内容をベクトル化する関数
     embedding: Callable[[list[str]], list[list[float]]]
     # ParquetBufferを保存する関数
-    save_parquet: Callable[[int, int, io.BytesIO], None]
+    storage_client: StorageClientProtocol

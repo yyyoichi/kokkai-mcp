@@ -3,7 +3,7 @@ import io
 import boto3
 from mypy_boto3_s3 import S3Client
 
-def get_minio_client(endpoint_url: str, access_key: str, secret_key: str):
+def get_minio_client(endpoint_url: str, access_key: str, secret_key: str) -> S3Client:
     client: S3Client = boto3.client( # type: ignore
         service_name='s3', # type: ignore
         endpoint_url=endpoint_url,

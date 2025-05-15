@@ -123,7 +123,7 @@ class SpeechRequestBuilder(BaseRequestBuilder):
             if original_name == "closing":
                 return "closing"
             if original_name == "from_":
-                return "from_"
+                return "from"
             if original_name == "speaker":
                 return "speaker"
             if original_name == "until":

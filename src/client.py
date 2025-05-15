@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import AsyncGenerator
 import hishel
 import httpx
-from src.config import KokkkaiAPIRequestConfig
+from src.config import KokkkaiAPIRequestConfig, party_leader_list
 from src.kokkaiapiclient.api.speech.get_record_packing_query_parameter_type import GetRecordPackingQueryParameterType
 from src.kokkaiapiclient.api.speech.speech_get_response import SpeechGetResponse
 from src.kokkaiapiclient.api.speech.speech_request_builder import SpeechRequestBuilder
@@ -51,6 +51,7 @@ class Client():
             from_=f"{year}-{month:02d}-01",
             until=f"{year}-{month:02d}-{monthrange(year, month)[1]}",
             record_packing=GetRecordPackingQueryParameterType.Json,
+            speaker=" ".join([item.leader for item in party_leader_list])
         )
 
         while has_next:
@@ -90,7 +91,7 @@ class Client():
                 print("取得できませんでした")
                 break
 
-            print(f"取得件数: {param.start_record}-> {speech.speech_response.number_of_return} {"use cache" if exists_cache else ""}") # type: ignore
+            print(f"取得件数: {param.start_record}-> {speech.speech_response.number_of_return} /{speech.speech_response.number_of_records} {"use cache" if exists_cache else ""}") # type: ignore
             has_next = speech.speech_response.next_record_position is not None
             if has_next:
                 # 次の取得位置を設定する

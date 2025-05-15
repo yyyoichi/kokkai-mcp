@@ -12,4 +12,4 @@ def encode_text(sentences: list[str]) -> list[list[float]]:
     global model
     if model is None:
         initialize_model()
-    return model.encode(sentences=sentences, convert_to_tensor=False).tolist() # type: ignore
+    return model.encode(sentences=sentences, convert_to_tensor=False, batch_size=10).tolist() # type: ignore

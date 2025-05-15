@@ -1,5 +1,3 @@
-
-
 from dataclasses import dataclass
 import datetime
 import io
@@ -7,6 +5,27 @@ from typing import AsyncGenerator, Callable, Protocol
 
 from src.kokkaiapiclient.api.speech.speech_get_response import SpeechGetResponse
 
+
+# 党首リスト
+# https://www.soumu.go.jp/main_content/000717993.pdf
+@dataclass
+class PartyLeader:
+    party: str
+    leader: str
+
+party_leader_list = [
+    PartyLeader(party="公明党", leader="石井啓一"),
+    PartyLeader(party="国民民主党", leader="玉木雄一郎"),
+    PartyLeader(party="参政党", leader="神谷宗幣"),
+    PartyLeader(party="社会民主党", leader="福島瑞穂"),
+    PartyLeader(party="自由民主党本部", leader="石破茂"),
+    PartyLeader(party="日本維新の会", leader="馬場伸幸"),
+    PartyLeader(party="日本保守党", leader="百田尚樹"),
+    PartyLeader(party="日本共産党中央委員会", leader="田村智子"),
+    PartyLeader(party="みんなでつくる党", leader="大津綾香"),
+    PartyLeader(party="立憲民主党", leader="野田佳彦"),
+    PartyLeader(party="れいわ新選組", leader="山本太郎"),
+]
 
 @dataclass
 class KokkkaiAPIRequestConfig:

@@ -1,6 +1,7 @@
 
 
 from dataclasses import dataclass
+import datetime
 import io
 from typing import AsyncGenerator, Callable, Protocol
 
@@ -36,8 +37,15 @@ class KokkkaiAPIRequestConfig:
         return self
 
 
-
-
+@dataclass
+class SpeechRequestParam:
+    """
+    APIリクエストのパラメータ
+    TODO 引数をこれに置換すること。
+    """
+    from_date: datetime.date
+    until_date: datetime.date
+    speaker: list[str] | None = None
 
 
 @dataclass

@@ -1,5 +1,5 @@
 import io
-from src.config import UploadSpeechParquetDependency
+from src.config import SpeechRequestParam, UploadSpeechParquetDependency
 from src.kokkaiapiclient.models.speech_record import SpeechRecord
 from src.model import SpeechParquetModel
 from src.parquet import SpeechParquet
@@ -10,12 +10,12 @@ class UploadSpeechParquetTask:
     def __init__(self, deps: UploadSpeechParquetDependency):
         self.deps = deps
 
-    async def run(self, year: int, month: int) -> None:
+    async def run(self, p: SpeechRequestParam) -> None:
         """
         ひと月分の発言をAPIから取得して、Parquet形式で保存する関数
         """
         parquet_buffer = SpeechParquet()
-        async for res in self.deps.api_client.iter_speech(year, month):
+        async for res in self.deps.api_client.iter_speech(p):
             if res.speech_response is None or res.speech_response.speech_record is None:
                 # 発言がない場合はスキップ
                 continue
@@ -34,7 +34,7 @@ class UploadSpeechParquetTask:
         # Parquetを出力
         buf = parquet_buffer.getvalue()
         # Parquetを保存する
-        self.deps.storage_client.upload_parquet(year, month, io.BytesIO(buf))
+        self.deps.storage_client.upload_parquet(p, io.BytesIO(buf))
 
     @staticmethod
     def map_speech_rec_to_model(speech: SpeechRecord) -> SpeechParquetModel:

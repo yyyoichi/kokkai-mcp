@@ -60,7 +60,6 @@ class KokkkaiAPIRequestConfig:
 class SpeechRequestParam:
     """
     APIリクエストのパラメータ
-    TODO 引数をこれに置換すること。
     """
     from_date: datetime.date
     until_date: datetime.date
@@ -71,10 +70,10 @@ class SpeechRequestParam:
 class UploadSpeechParquetDependency:
     class SpeechApiClientProtocol(Protocol):
         def iter_speech(
-            self, year: int, month: int
+            self, p: SpeechRequestParam,
         ) -> AsyncGenerator[SpeechGetResponse, None]: ...
     class StorageClientProtocol(Protocol):
-        def upload_parquet(self, year: int, month: int, buffer: io.BytesIO) -> None: ...
+        def upload_parquet(self, p: SpeechRequestParam, buffer: io.BytesIO) -> None: ...
 
     # APIの取得クライアント
     api_client: SpeechApiClientProtocol

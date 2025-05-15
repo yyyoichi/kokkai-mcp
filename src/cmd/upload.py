@@ -1,13 +1,14 @@
 
+from datetime import date
 import os
 from src.client import Client
-from src.config import KokkkaiAPIRequestConfig, UploadSpeechParquetDependency
+from src.config import KokkkaiAPIRequestConfig, SpeechRequestParam, UploadSpeechParquetDependency, party_leader_list
 from src.sentence_transformers import encode_text, initialize_model
 from src.storage import StorageClient, get_minio_client
 from src.task import UploadSpeechParquetTask
 
 
-async def main(yyyyMM: str):
+async def main():
     endpoint_url = os.getenv("MINIO_ENDPOINT")
     access_key = os.getenv("MINIO_ACCESS_KEY")
     secret_key = os.getenv("MINIO_SECRET_KEY")
@@ -19,13 +20,6 @@ async def main(yyyyMM: str):
         print(f"BUCKET_NAME: {bucket_name}")
         raise ValueError("MINIO_ENDPOINT, MINIO_ACCESS_KEY, and MINIO_SECRET_KEY, BUCKET_NAME must be set")
 
-    if len(yyyyMM) != 6:
-        raise ValueError("yyyyMM must be in the format YYYYMM")
-    
-    year = int(yyyyMM[:4])
-    month = int(yyyyMM[4:6])
-    if month < 1 or month > 12:
-        raise ValueError("Year must be 2024 or later, and month must be between 1 and 12")
     
     deps = UploadSpeechParquetDependency(
         api_client=Client(config=KokkkaiAPIRequestConfig(use_cache=False)),
@@ -42,24 +36,22 @@ async def main(yyyyMM: str):
 
     print(f"\nStarting process\nInitializing model...")
     initialize_model()
-    print(f"Uploading data for {year}-{month:02}...")
+    print(f"Uploading data for 2025-01-01 ~04-30...")
     task = UploadSpeechParquetTask(deps=deps)
-    await task.run(
-        year=year,
-        month=month,
+    p = SpeechRequestParam(
+        from_date=date.fromisoformat("2025-01-01"),
+        until_date=date.fromisoformat("2025-04-30"),
+        speaker=[item.leader for item in party_leader_list],
     )
+    await task.run(p)
 
 
 
 if __name__ == "__main__":
     import asyncio
     import sys
-    if len(sys.argv) != 2:
-        print("Usage: python -m src.cmd.upload <yyyyMM>")
-        sys.exit(1)
-    yyyyMM = sys.argv[1]
     try:
-        asyncio.run(main(yyyyMM))
+        asyncio.run(main())
     except ValueError as e:
         print(f"Error: {e}")
         sys.exit(1)

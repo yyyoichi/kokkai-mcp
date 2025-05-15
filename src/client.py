@@ -1,11 +1,10 @@
 import asyncio
-from calendar import monthrange
 from datetime import timedelta, datetime
 from pathlib import Path
 from typing import AsyncGenerator
 import hishel
 import httpx
-from src.config import KokkkaiAPIRequestConfig, party_leader_list
+from src.config import KokkkaiAPIRequestConfig, SpeechRequestParam
 from src.kokkaiapiclient.api.speech.get_record_packing_query_parameter_type import GetRecordPackingQueryParameterType
 from src.kokkaiapiclient.api.speech.speech_get_response import SpeechGetResponse
 from src.kokkaiapiclient.api.speech.speech_request_builder import SpeechRequestBuilder
@@ -42,16 +41,16 @@ class Client():
         else:
             self.client = get_client_no_cache()
 
-    async def iter_speech(self, year: int, month: int) -> AsyncGenerator[SpeechGetResponse, None]:
+    async def iter_speech(self, p: SpeechRequestParam) -> AsyncGenerator[SpeechGetResponse, None]:
         request_enable = datetime.now()
         has_next = True
         param = SpeechRequestBuilder.SpeechRequestBuilderGetQueryParameters(
             start_record=1,
             maximum_records=100,
-            from_=f"{year}-{month:02d}-01",
-            until=f"{year}-{month:02d}-{monthrange(year, month)[1]}",
+            from_=p.from_date.isoformat(),
+            until=p.until_date.isoformat(),
             record_packing=GetRecordPackingQueryParameterType.Json,
-            speaker=" ".join([item.leader for item in party_leader_list])
+            speaker= " ".join(p.speaker) if p.speaker is not None else None,
         )
 
         while has_next:

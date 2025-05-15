@@ -1,8 +1,10 @@
 
+from datetime import date
 import os
 from contextlib import contextmanager
 from mypy_boto3_s3 import S3Client
 from botocore.exceptions import ClientError
+from src.config import SpeechRequestParam
 from src.storage import StorageClient, get_minio_client
 
 def load_env():
@@ -51,10 +53,15 @@ def storage_client_manager(bucket_name: str):
 
 def test_storage():
 
+    p = SpeechRequestParam(
+        from_date=date.fromisoformat("2023-01-01"),
+        until_date=date.fromisoformat("2023-01-02"),
+    )
+
     ## emptyを確認するヘルパーテスト
     def test_empty_storage(client: StorageClient):
         try:
-            client.download_parquet(2023, 1)
+            client.download_parquet(p)
         except ClientError as e:
             err = e.response.get("Error", None)
             if err is not None:
@@ -71,12 +78,12 @@ def test_storage():
         # upload
         import io
         buffer = io.BytesIO(b"test")
-        client.upload_parquet(2023, 1, buffer)
+        client.upload_parquet(p, buffer)
         # download
-        buffer = client.download_parquet(2023, 1)
+        buffer = client.download_parquet(p)
         assert buffer.getvalue() == b"test"
         # remove
-        client.remove_parquet(2023, 1)
+        client.remove_parquet(p)
         # download
         test_empty_storage(client)
 

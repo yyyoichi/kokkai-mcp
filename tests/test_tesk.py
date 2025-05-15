@@ -1,11 +1,12 @@
 
 
+from datetime import date
 import io
 import pandas as pd
 import pytest
 import pandas as pd
 import pyarrow.parquet as pq
-from src.config import UploadSpeechParquetDependency
+from src.config import SpeechRequestParam, UploadSpeechParquetDependency
 from src.kokkaiapiclient.api.speech.speech_get_response import SpeechGetResponse
 from src.kokkaiapiclient.models.name_of_house import NameOfHouse
 from src.kokkaiapiclient.models.speech_record import SpeechRecord
@@ -29,7 +30,7 @@ async def test_upload_parquet_task_table(rec_count: int, expected_rows: int):
         def __init__(self, rec_count: int):
             self.rec_count = rec_count
 
-        async def iter_speech(self, year: int, month: int):
+        async def iter_speech(self, p: SpeechRequestParam):
             for i in range(self.rec_count):
                 rec = SpeechRecord(
                     date="2024-01-01",
@@ -54,7 +55,7 @@ async def test_upload_parquet_task_table(rec_count: int, expected_rows: int):
         def __init__(self):
             self.uploaded_data: pd.DataFrame = pd.DataFrame()
 
-        def upload_parquet(self, year: int, month: int, buffer: io.BytesIO) -> None:
+        def upload_parquet(self, p: SpeechRequestParam, buffer: io.BytesIO) -> None:
             table = pq.read_table(buffer) # type: ignore
             read_df = table.to_pandas() # type: ignore
             self.uploaded_data = read_df
@@ -68,7 +69,11 @@ async def test_upload_parquet_task_table(rec_count: int, expected_rows: int):
 
     task = UploadSpeechParquetTask(deps)
 
-    await task.run(2024, 1)
+
+    await task.run(p = SpeechRequestParam(
+        from_date=date.fromisoformat("2023-01-01"),
+        until_date=date.fromisoformat("2023-01-02"),
+    ))
 
     # ストレージに読まれた行数をテスト
     assert storage_client.uploaded_data.shape[0] == expected_rows

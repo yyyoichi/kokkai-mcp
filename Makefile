@@ -1,8 +1,8 @@
 include .env.local
 
-upload-%:
+upload:
 	MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY} MINIO_SECRET_KEY=${MINIO_SECRET_KEY} \
-	python -m src.cmd.upload ${@:upload-%=%}
+	uv run python -m src.cmd.upload
 
 init-bucket:
 	@echo "Creating bucket on MinIO"

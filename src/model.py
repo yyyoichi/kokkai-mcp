@@ -18,7 +18,7 @@ class SpeechParquetModel:
     # 会議名
     name_of_meeting: str
     # 号数
-    issue: int
+    issue: str
     # 会議録ID
     issue_id: str
     # 発言者名
@@ -54,7 +54,7 @@ class SpeechParquetModel:
             pa.field('session', pa.int16()),  # type: ignore
             pa.field('name_of_house', pa.string()), # type: ignore
             pa.field('name_of_meeting', pa.string()), # type: ignore
-            pa.field('issue', pa.int16()),  # type: ignore
+            pa.field('issue', pa.string()),  # type: ignore
             pa.field('issue_id', pa.string()), # type: ignore
             pa.field('speaker', pa.string()), # type: ignore
             pa.field('speech_order', pa.int16()),  # type: ignore

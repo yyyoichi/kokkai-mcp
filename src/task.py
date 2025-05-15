@@ -41,14 +41,12 @@ class UploadSpeechParquetTask:
         """
         APIのレスポンスをSpeechParquetModelに変換する
         """
-        # 第x号 '第'と'号'を除去して、intに変換
-        issue = int((speech.issue or "").replace("第", "").replace("号", "")) if speech.issue else 0
         m = SpeechParquetModel(
             date=speech.date or "",
             session=speech.session or 0,
             name_of_house=speech.name_of_house or "", # type: ignore
             name_of_meeting=speech.name_of_meeting or "",
-            issue=issue,
+            issue=speech.issue or "",
             issue_id=speech.issue_i_d or "",
             speaker=speech.speaker.string if speech.speaker and speech.speaker.string else "",
             speech_order=speech.speech_order or 0,

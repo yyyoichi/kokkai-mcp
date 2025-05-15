@@ -28,7 +28,7 @@ async def main(yyyyMM: str):
         raise ValueError("Year must be 2024 or later, and month must be between 1 and 12")
     
     deps = UploadSpeechParquetDependency(
-        api_client=Client(config=KokkkaiAPIRequestConfig(refer_cache=True)),
+        api_client=Client(config=KokkkaiAPIRequestConfig(use_cache=False)),
         embedding=encode_text,
         storage_client=StorageClient(
             client=get_minio_client(

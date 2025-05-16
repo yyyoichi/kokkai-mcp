@@ -37,12 +37,12 @@ def query_speech_parquet(
     # クエリ条件を組み立て
     filter_parts: list[str] = []
     if from_date:
-        filter_parts.append(f"date >= DATE '{from_date.isoformat()}'")
+        filter_parts.append(f"date >= ''{from_date.isoformat()}''")
     if until_date:
-        filter_parts.append(f"date <= DATE '{until_date.isoformat()}'")
+        filter_parts.append(f"date <= ''{until_date.isoformat()}''")
     if speaker:
         safe_speaker = speaker.replace("'", "''")  # Basic SQL string escaping
-        filter_parts.append(f"speaker = '{safe_speaker}'")
+        filter_parts.append(f"speaker = ''{safe_speaker}''")
     # The filter expression is a SQL boolean expression string
     filter_sql_expression = " AND ".join(filter_parts) if filter_parts else "TRUE"
     # The query vector needs to be in a SQL array format
@@ -90,8 +90,8 @@ if __name__ == "__main__":
     df = query_speech_parquet(
         s3uri=s3uri,
         query=query,
-        # from_date=date(2024, 1, 1),
+        from_date=date(2025, 3, 1),
         # until_date=date(2024, 12, 31),
-        # speaker="山田太郎"
+        speaker="石破茂"
     )
     print(df)

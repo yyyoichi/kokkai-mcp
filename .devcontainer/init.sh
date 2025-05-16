@@ -13,6 +13,9 @@ else
     echo "skip make venv"
 fi
 
+echo "Installing libgfortran5..."
+sudo apt-get update && sudo apt-get install libgfortran5 -y
+
 echo "Installing kiota..."
 curl "https://aka.ms/get/kiota/latest/linux-x64.zip" -o kiota.zip
 unzip -o kiota.zip -d /usr/local/bin

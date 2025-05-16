@@ -1,0 +1,97 @@
+import duckdb
+from datetime import date
+from typing import Optional
+
+def query_speech_parquet(
+    s3uri: str,
+    query: list[float],
+    from_date: Optional[date] = None,
+    until_date: Optional[date] = None,
+    speaker: Optional[str] = None,
+    topk: int = 5
+):
+    con = duckdb.connect(database=":memory:",config = {'allow_unsigned_extensions': 'true'}) # type: ignore
+
+    # faiss拡張をロード
+    con.execute("INSTALL faiss FROM community;")
+    con.sql("LOAD faiss;")
+    con.execute('INSTALL httpfs;')
+    con.sql('LOAD httpfs;')
+    con.execute("SET force_download=true;")
+    con.execute(f"""
+        CREATE OR REPLACE TABLE speeches AS
+        SELECT ROW_NUMBER() OVER () AS faiss_id -- 連番を付与してfaiss_idとして使用
+        , * FROM read_parquet('{s3uri}');
+    """)
+
+    dimension = 384  # モデル依存。Assuming query vector's length is the dimension
+    index_name = 'speeches_faiss_idx'  # A unique name for your FAISS index
+    # 1. Create a FAISS index
+    # 'IDMap,Flat' creates an index that maps FAISS internal IDs back to your provided IDs (original_id)
+    # and uses a flat (exact L2) search. For larger datasets, consider other types like 'IDMap,HNSW32'.
+    con.execute(f"CALL FAISS_CREATE('{index_name}', {dimension}, 'IDMap,Flat');")
+    # 2. Add data to the FAISS index
+    # This selects the 'faiss_id' and 'speech_vector' from your table.
+    con.execute(f"CALL FAISS_ADD((SELECT faiss_id, speech_vector FROM speeches), '{index_name}');")
+
+    # クエリ条件を組み立て
+    filter_parts: list[str] = []
+    if from_date:
+        filter_parts.append(f"date >= DATE '{from_date.isoformat()}'")
+    if until_date:
+        filter_parts.append(f"date <= DATE '{until_date.isoformat()}'")
+    if speaker:
+        safe_speaker = speaker.replace("'", "''")  # Basic SQL string escaping
+        filter_parts.append(f"speaker = '{safe_speaker}'")
+    # The filter expression is a SQL boolean expression string
+    filter_sql_expression = " AND ".join(filter_parts) if filter_parts else "TRUE"
+    # The query vector needs to be in a SQL array format
+    query_vector_sql_literal = f"CAST({query} AS FLOAT[])"
+
+    # ベクトル検索（faiss）＋属性フィルタ
+    # 4. Perform the search using FAISS_SEARCH_FILTER and join results
+    sql = f"""
+    WITH faiss_search_results AS (
+        SELECT
+            (result_item).label AS id_from_faiss,      -- This 'label' is the 'faiss_id'
+            (result_item).distance AS l2_distance
+        FROM
+            UNNEST(FAISS_SEARCH_FILTER(
+                '{index_name}',                 -- Name of the FAISS index
+                {topk},                         -- Number of nearest neighbors to retrieve
+                {query_vector_sql_literal},     -- The query vector
+                '{filter_sql_expression}',      -- SQL filter condition to apply on 'speeches' table
+                'faiss_id',                  -- Column in 'speeches' providing IDs for filtering
+                'speeches'                      -- Table to apply the filter on
+            )) AS tbl(result_item)              -- Unnest the list of structs returned by FAISS
+    )
+    SELECT
+        s.*,  -- Select all columns from the original speeches table
+        fsr.l2_distance AS l2  -- Add the L2 distance from FAISS results
+    FROM
+        speeches s
+    JOIN
+        faiss_search_results fsr ON s.faiss_id = fsr.id_from_faiss
+    ORDER BY
+        fsr.l2_distance ASC; 
+    """
+    # Note: The LIMIT {topk} is handled by the 'k' parameter in FAISS_SEARCH_FILTER.
+        
+
+    results = con.execute(sql).fetchdf()
+    return results
+
+# 使い方例
+if __name__ == "__main__":
+    import random
+    s3uri = "http://localhost:9001/api/v1/download-shared-object/aHR0cDovLzEyNy4wLjAuMTo5MDAwL2tva2thaS1tY3AtYnVja2V0L2tva2thaV9zcGVlY2hfMjAyNS0wMS0wMV8yMDI1LTA0LTMwLnBhcnF1ZXQ_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD0wUVg2MTM0QzBCN0dBOUlTTVpJMyUyRjIwMjUwNTE2JTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI1MDUxNlQwMzU3MzJaJlgtQW16LUV4cGlyZXM9NDMxOTkmWC1BbXotU2VjdXJpdHktVG9rZW49ZXlKaGJHY2lPaUpJVXpVeE1pSXNJblI1Y0NJNklrcFhWQ0o5LmV5SmhZMk5sYzNOTFpYa2lPaUl3VVZnMk1UTTBRekJDTjBkQk9VbFRUVnBKTXlJc0ltVjRjQ0k2TVRjME56UXhNREkzTml3aWNHRnlaVzUwSWpvaWJXbHVhVzloWkcxcGJpSjkuTXE1bWI5QWI4RnkxZjRtaVhCRXlNM2RHeUlfT25mSjV6LUJvVnVsdk9ZNno2YUZpa3VNd0lseUFKbmg4NWZkdXROM2VzNDh2Z2t1MzlkZENDcGRqeHcmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0JnZlcnNpb25JZD1udWxsJlgtQW16LVNpZ25hdHVyZT1kMjIxMTY3YjliODQ1NDU0ZmMyZmUyMDdjOWM1OGQ2YTY3ZjU3OTZjYzVlMmEzZjNjZDg2OTQyMTBjMWM2YmRh"
+    query = [random.random() for _ in range(384)]  # クエリベクトル
+    # from datetime import date
+    df = query_speech_parquet(
+        s3uri=s3uri,
+        query=query,
+        # from_date=date(2024, 1, 1),
+        # until_date=date(2024, 12, 31),
+        # speaker="山田太郎"
+    )
+    print(df)

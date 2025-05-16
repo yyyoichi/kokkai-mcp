@@ -1,8 +1,8 @@
 
-from datetime import date
+from datetime import date, datetime
 import os
 from src.client import Client
-from src.config import KokkkaiAPIRequestConfig, SpeechRequestParam, UploadSpeechParquetDependency, party_leader_list
+from src.config import KokkkaiAPIRequestConfig, SpeechRequestParam, UploadSpeechParquetDependency
 from src.sentence_transformers import encode_text, initialize_model
 from src.storage import StorageClient, get_minio_client
 from src.task import UploadSpeechParquetTask
@@ -41,9 +41,11 @@ async def main():
     p = SpeechRequestParam(
         from_date=date.fromisoformat("2025-01-01"),
         until_date=date.fromisoformat("2025-04-30"),
-        speaker=[item.leader for item in party_leader_list],
+        # speaker=[item.leader for item in party_leader_list],
     )
+    print(datetime.now())
     await task.run(p)
+    print(datetime.now())
 
 
 

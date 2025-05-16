@@ -1,8 +1,10 @@
 import argparse
 import asyncio
+from calendar import monthrange
+from datetime import date
 from typing import List
 from src.client import Client
-from src.config import KokkkaiAPIRequestConfig
+from src.config import KokkkaiAPIRequestConfig, SpeechRequestParam
 from src.kokkaiapiclient.api.speech.speech_get_response import SpeechGetResponse
 
 if __name__ == "__main__":
@@ -18,7 +20,13 @@ if __name__ == "__main__":
         Get speech data for a specific year and month.
         """
         speeches :List[SpeechGetResponse] = []
-        async for s in c.iter_speech(year, month):
+        from_date = f"{year:04d}-{month:02d}-01"
+        until_date = f"{year:04d}-{month:02d}-{monthrange(year, month)[1]}"
+        p = SpeechRequestParam(
+            from_date=date.fromisoformat(from_date),
+            until_date=date.fromisoformat(until_date),
+        )
+        async for s in c.iter_speech(p):
             speeches.append(s)
         return speeches
     

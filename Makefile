@@ -14,6 +14,10 @@ init-bucket:
 		--endpoint-url ${MINIO_ENDPOINT} --region ap-northeast-1
 .PHONY: init-bucket
 
+mcp:
+	S3URI="http://localhost:9000/kokkai-mcp-bucket/kokkai_speech_2025-01-01_2025-04-30.parquet" \
+	uv run python -m src.cmd.mcp
+
 
 gen-client:
 	kiota generate -l python -d "https://yyyoichi.github.io/kokkai-api-schema/schema/openapi.yaml" -n client -o ./src/kokkaiapiclient

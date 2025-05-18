@@ -1679,9 +1679,7 @@ source = { virtual = "." }
 dependencies = [
     { name = "boto3" },
     { name = "boto3-stubs", extra = ["s3"] },
-    { name = "duckdb" },
     { name = "hishel" },
-    { name = "mcp", extra = ["cli"] },
     { name = "microsoft-kiota-abstractions" },
     { name = "microsoft-kiota-authentication-azure" },
     { name = "microsoft-kiota-bundle" },
@@ -1693,6 +1691,12 @@ dependencies = [
     { name = "pyarrow-stubs" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
+]
+
+[package.optional-dependencies]
+docker = [
+    { name = "duckdb" },
+    { name = "mcp", extra = ["cli"] },
     { name = "sentence-transformers" },
 ]
 
@@ -1700,9 +1704,9 @@ dependencies = [
 requires-dist = [
     { name = "boto3", extras = ["s3"], specifier = ">=1.38.9" },
     { name = "boto3-stubs", extras = ["s3"], specifier = ">=1.38.9" },
-    { name = "duckdb", specifier = ">=1.2.2" },
+    { name = "duckdb", marker = "extra == 'docker'", specifier = ">=1.2.2" },
     { name = "hishel", specifier = ">=0.1.2" },
-    { name = "mcp", extras = ["cli"], specifier = ">=1.9.0" },
+    { name = "mcp", extras = ["cli"], marker = "extra == 'docker'", specifier = ">=1.9.0" },
     { name = "microsoft-kiota-abstractions", specifier = ">=1.9.3" },
     { name = "microsoft-kiota-authentication-azure", specifier = ">=1.9.3" },
     { name = "microsoft-kiota-bundle", specifier = ">=1.9.3" },
@@ -1714,8 +1718,9 @@ requires-dist = [
     { name = "pyarrow-stubs", specifier = ">=19.2" },
     { name = "pytest", specifier = ">=8.3.5" },
     { name = "pytest-asyncio", specifier = ">=0.26.0" },
-    { name = "sentence-transformers", specifier = ">=4.1.0" },
+    { name = "sentence-transformers", marker = "extra == 'docker'", specifier = ">=4.1.0" },
 ]
+provides-extras = ["docker"]
 
 [[package]]
 name = "wrapt"

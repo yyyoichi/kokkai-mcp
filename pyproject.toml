@@ -7,9 +7,7 @@ requires-python = ">=3.13"
 dependencies = [
     "boto3-stubs[s3]>=1.38.9",
     "boto3[s3]>=1.38.9",
-    "duckdb>=1.2.2",
     "hishel>=0.1.2",
-    "mcp[cli]>=1.9.0",
     "microsoft-kiota-abstractions>=1.9.3",
     "microsoft-kiota-authentication-azure>=1.9.3",
     "microsoft-kiota-bundle>=1.9.3",
@@ -21,5 +19,11 @@ dependencies = [
     "pyarrow-stubs>=19.2",
     "pytest>=8.3.5",
     "pytest-asyncio>=0.26.0",
+]
+
+[project.optional-dependencies]
+docker = [
+    "duckdb>=1.2.2",
     "sentence-transformers>=4.1.0",
+    "mcp[cli]>=1.9.0",
 ]

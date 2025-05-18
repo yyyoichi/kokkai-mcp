@@ -8,7 +8,7 @@ if [ ! -f ".venv/bin/python" ]; then
     echo "🎍 make venv"
     uv venv && \
         source .venv/bin/activate && \
-        uv sync --frozen
+        uv sync --frozen --all-extras
 else
     echo "skip make venv"
 fi
